@@ -4,6 +4,9 @@ import math
 
 pygame.init()
 
+clock = pygame.time.Clock()
+FPS = 60
+
 #Create window
 pygame.display.set_caption("Comet fall game")
 icon = pygame.image.load("assets/banner.png")
@@ -50,7 +53,11 @@ while running:
             game.pressed[event.key] = True
             #Touch space detected
             if event.key == pygame.K_SPACE:
-                game.player.launch_projectile()
+                if game.is_playing:
+                    game.player.launch_projectile()
+                else:
+                    game.start()
+                    game.sound_manager.play("click")
 
         #if keyboard is not pressed
         elif event.type == pygame.KEYUP:
@@ -60,4 +67,6 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if play_button_rect.collidepoint(event.pos):
                 game.start()
+                game.sound_manager.play("click")
 
+    clock.tick(FPS)

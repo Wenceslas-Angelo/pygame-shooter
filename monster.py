@@ -4,8 +4,8 @@ from animation import  AnimateSprite
 
 class Monster(AnimateSprite):
 
-    def __init__(self, game):
-        super().__init__("mummy")
+    def __init__(self, game, name, size, offset=0):
+        super().__init__(name, size)
         self.game= game
         self.health = 100
         self.max_health = 100
@@ -13,16 +13,24 @@ class Monster(AnimateSprite):
         # self.image = pygame.image.load("assets/mummy.png")
         self.rect = self.image.get_rect()
         self.rect.x = 1000 + random.randint(0, 300)
-        self.rect.y = 440
-        self.velocity = random.randint(1, 3)
+        self.rect.y = 440 - offset
+        self.loot_amount = 20
         self.start_animation()
+
+    def set_speed(self, speed):
+        self.default_speed = speed
+        self.velocity = random.randint(1, 3)
+
+    def set_loot_amount(self, amount):
+        self.loot_amount = amount
 
     def damage(self, amount):
         self.health -= amount
         if self.health <= 0:
             self.rect.x = 1000 + random.randint(0, 300)
-            self.velocity = random.randint(1, 3)
+            self.velocity = random.randint(1, self.default_speed)
             self.health = self.max_health
+            self.game.add_score(self.loot_amount)
 
             if self.game.comet_event.is_full_loaded():
                 self.game.all_monsters.remove(self)
@@ -40,3 +48,21 @@ class Monster(AnimateSprite):
             self.rect.x -= self.velocity
         else:
             self.game.player.damage(self.attack)
+
+
+class Mummy(Monster):
+
+    def __init__(self, game):
+        super().__init__(game,"mummy", (130, 130))
+        self.set_speed(3)
+        self.set_loot_amount(20)
+
+class Alien(Monster):
+
+    def __init__(self, game):
+        super().__init__(game,"alien", (300, 300), 130)
+        self.health = 250
+        self.max_health = 250
+        self.attack = 0.8
+        self.set_speed(2)
+        self.set_loot_amount(80)
